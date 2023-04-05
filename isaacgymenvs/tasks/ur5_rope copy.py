@@ -65,12 +65,17 @@ class UR5Rope(VecTask):
         num_obs = 12
         num_acts = 6
 
-        self.num_rope_joints = 48
-        self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 # 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori)
+        self.cfg["env"]["numObservations"] = 18 + 46 + 3
         self.cfg["env"]["numActions"] = 6
 
         super().__init__(config=self.cfg, sim_device=sim_device, graphics_device_id=graphics_device_id,
                          headless=headless)
+
+        #############################
+        # Robot-Rope specifications #
+        #############################
+        self.num_dofs_robot = 7
+        self.num_dofs_rope = 24
 
         # get gym GPU state tensors
         actor_root_state_tensor = self.gym.acquire_actor_root_state_tensor(self.sim)
@@ -82,11 +87,11 @@ class UR5Rope(VecTask):
         self.gym.refresh_rigid_body_state_tensor(self.sim)
 
         # create some wrapper tensors for different slices
-        self.franka_default_dof_pos = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469, 0., 0.], device=self.device)
-        self.franka_default_dof_pos = torch.zeros(7+self.num_rope_joints, device=self.device) 
-        self.franka_default_dof_pos[:7] = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469], device=self.device)
+        # self.franka_default_dof_pos = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469, 0., 0.], device=self.device)
+        self.franka_default_dof_pos = torch.zeros(self.num_dofs_robot + self.num_dofs_rope,
+                                                    device=self.device)
+        self.franka_default_dof_pos[:self.num_dofs_robot] = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469], device=self.device)
         
-        # Die here
         self.dof_state = gymtorch.wrap_tensor(dof_state_tensor)
         self.franka_dof_state = self.dof_state.view(self.num_envs, -1, 2)[:, :self.num_franka_dofs]
         self.dof_pos = self.franka_dof_state[..., 0]
@@ -98,7 +103,7 @@ class UR5Rope(VecTask):
         self.root_state_tensor = gymtorch.wrap_tensor(actor_root_state_tensor).view(self.num_envs, -1, 13)
 
         self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs
-
+        assert(self.num_dofs == self.num_dofs_rope + self.num_dofs_robot)
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
 
     def create_sim(self):
@@ -161,24 +166,14 @@ class UR5Rope(VecTask):
         for i in range(self.num_franka_dofs):
             franka_dof_props['driveMode'][i] = gymapi.DOF_MODE_EFFORT
             # if self.physics_engine == gymapi.SIM_PHYSX:
-                # franka_dof_props['stiffness'][i] = franka_dof_stiffness[i]
-                # franka_dof_props['damping'][i] = franka_dof_damping[i]
+            #     franka_dof_props['stiffness'][i] = franka_dof_stiffness[i]
+            #     franka_dof_props['damping'][i] = franka_dof_damping[i]
             # else:
             #     franka_dof_props['stiffness'][i] = 7000.0
             #     franka_dof_props['damping'][i] = 50.0
 
-            # self.franka_dof_lower_limits.append(-1.0)
-            # self.franka_dof_upper_limits.append(1.0)
-            if i < 7:
-                franka_dof_props['stiffness'][i] = franka_dof_stiffness[i]
-                franka_dof_props['damping'][i] = franka_dof_damping[i]
-                self.franka_dof_lower_limits.append(franka_dof_props['lower'][i])
-                self.franka_dof_upper_limits.append(franka_dof_props['upper'][i])
-            else:
-                franka_dof_props['stiffness'][i] = 0.1
-                franka_dof_props['damping'][i] = 0.1
-                self.franka_dof_lower_limits.append(-np.inf)
-                self.franka_dof_upper_limits.append(np.inf)
+            self.franka_dof_lower_limits.append(-1.0)
+            self.franka_dof_upper_limits.append(1.0)
 
         self.franka_dof_lower_limits = to_torch(self.franka_dof_lower_limits, device=self.device)
         self.franka_dof_upper_limits = to_torch(self.franka_dof_upper_limits, device=self.device)
@@ -204,12 +199,8 @@ class UR5Rope(VecTask):
 
 
     def compute_reward(self, actions):
-        time_since_reset = self.progress_buf * self.dt
-
         self.rew_buf[:], self.reset_buf[:] = compute_franka_reward(
-            self.obs_buf, self.reset_buf, self.progress_buf, self.actions, 
-            self.action_penalty_scale, self.max_episode_length,
-            time_since_reset
+            self.obs_buf, self.reset_buf, self.progress_buf, self.actions, self.action_penalty_scale, self.max_episode_length
         )
 
     def compute_observations(self):
@@ -224,13 +215,10 @@ class UR5Rope(VecTask):
         rope_end_pos = rope_end_state[:, :3]
         print("Rope end position: ", rope_end_state[0, :3])
 
-        hand_state = self.rigid_body_states[:, 7, :]
-        hand_pos = hand_state[:, :3]
-        hand_ori = hand_state[:, 3:7]
-
         dof_pos = self.dof_pos - self.franka_default_dof_pos
-        self.obs_buf = torch.cat((dof_pos, self.dof_vel * self.dof_vel_scale, rope_end_pos, hand_pos, hand_ori),
+        self.obs_buf = torch.cat((dof_pos, self.dof_vel * self.dof_vel_scale, rope_end_pos),
                                  dim=-1)
+
         return self.obs_buf
 
     def reset_idx(self, env_ids):
@@ -272,26 +260,13 @@ class UR5Rope(VecTask):
 #####################################################################
 ###=========================jit functions=========================###
 #####################################################################
-# @torch.jit.script
-# def cycle_target(t):
-#     # type: (Tensor) -> Tensor
 
-#     default_hand_pos = torch.tensor([0.2, 0.2, 0.7], device="cuda:0")
-
-#     cycle_per_second = 1
-#     w = (2 * np.pi) / cycle_per_second
-#     r = 0.1
-#     center = default_hand_pos 
-#     target = center
-#     target[1] = r * torch.cos(w*t)
-#     target[2] = r * torch.sin(w*t)
-#     return target
 
 @torch.jit.script
 def compute_franka_reward(
-        obs_buf, reset_buf, progress_buf, actions, action_penalty_scale, max_episode_length, time_since_reset
+        obs_buf, reset_buf, progress_buf, actions, action_penalty_scale, max_episode_length
 ):
-    # type: (Tensor, Tensor, Tensor, Tensor, float, float, Tensor) -> Tuple[Tensor, Tensor]
+    # type: (Tensor, Tensor, Tensor, Tensor, float, float) -> Tuple[Tensor, Tensor]
 
     # DOF position reward
     dof_pos = obs_buf[:, :6]
@@ -299,9 +274,9 @@ def compute_franka_reward(
     # target_dof[0, 1] = -1.0
     dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
-    rope_pos = obs_buf[:, -10:-7]
+    rope_pos = obs_buf[:, -3:]
     target_pos = torch.tensor([0.2, 0.8, 0.5], device="cuda:0")
-    pos_reward = 0 * torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
+    pos_reward = torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
 
     # DOF velocity penalty
     dof_vel = obs_buf[:, 6:]
@@ -310,32 +285,7 @@ def compute_franka_reward(
     # regularization on the actions (summed for each environment)
     action_penalty = torch.sum(actions ** 2, dim=-1)
 
-    # Hand position reward
-    # target = cycle_target(time_since_reset)
-
-    default_hand_pos = torch.tensor([0.2, 0.2, 0.7], device="cuda:0")
-    default_hand_pos = torch.ones((progress_buf.shape[0], 3), device="cuda:0") * default_hand_pos
-
-    cycle_per_second = 1
-    w = (2 * np.pi) / cycle_per_second
-    r = 0.1
-    center = default_hand_pos 
-    target = center
-    print(time_since_reset)
-
-    target[:, 1] = r * torch.cos(w*time_since_reset)
-    target[:, 2] = r * torch.sin(w*time_since_reset)
-    ###############################################
-    hand_pos = obs_buf[:, -7:-4]
-
-    hand_ori = obs_buf[:, -4:]
-    # TODO: change it to correct direction
-    target_ori = torch.tensor([0, 0, 0, 1], device="cuda:0")
-
-    hand_pos_reward = torch.sum(torch.exp(-torch.square(hand_pos - target)), dim=-1)
-    hand_ori_reward = torch.sum(torch.exp(-torch.square(hand_ori - target_ori)), dim=-1)
-
-    rewards = hand_pos_reward + hand_ori_reward + pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.0
+    rewards = pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.0
 
     # reset if max length reached
     reset_buf = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), reset_buf)

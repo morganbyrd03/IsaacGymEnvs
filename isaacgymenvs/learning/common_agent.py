@@ -75,7 +75,6 @@ class CommonAgent(a2c_continuous.A2CAgent):
         self.last_lr = float(self.last_lr)
 
         self.optimizer = optim.Adam(self.model.parameters(), float(self.last_lr), eps=1e-08, weight_decay=self.weight_decay)
-
         if self.normalize_input:
             obs_shape = torch_ext.shape_whc_to_cwh(self.obs_shape)
             self.running_mean_std = RunningMeanStd(obs_shape).to(self.ppo_device)
