@@ -62,9 +62,6 @@ class FrankaRope(VecTask):
         self.distX_offset = 0.04
         self.dt = 1 / 60.
 
-        num_obs = 12
-        num_acts = 6
-
         self.num_rope_joints = 48
         self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 # 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori)
         self.cfg["env"]["numActions"] = 6
@@ -123,11 +120,6 @@ class FrankaRope(VecTask):
         asset_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../assets")
         franka_asset_file = "urdf/franka_description/robots/franka_panda_rope.urdf"
 
-        # if "asset" in self.cfg["env"]:
-        #     asset_root = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-        #                               self.cfg["env"]["asset"].get("assetRoot", asset_root))
-        #     franka_asset_file = self.cfg["env"]["asset"].get("assetFileNameFranka", franka_asset_file)
-
         # load franka asset
         asset_options = gymapi.AssetOptions()
         asset_options.flip_visual_attachments = True
@@ -149,26 +141,12 @@ class FrankaRope(VecTask):
 
         print("DOFs, bodies: ", self.num_franka_dofs, self.num_franka_bodies)
 
-        # Note - for this asset we are loading the actuator info from the MJCF
-        actuator_props = self.gym.get_asset_actuator_properties(franka_asset)
-        motor_efforts = [prop.motor_effort for prop in actuator_props]
-        self.joint_gears = to_torch(motor_efforts, device=self.device)
-
         # set franka dof properties
         franka_dof_props = self.gym.get_asset_dof_properties(franka_asset)
         self.franka_dof_lower_limits = []
         self.franka_dof_upper_limits = []
         for i in range(self.num_franka_dofs):
             franka_dof_props['driveMode'][i] = gymapi.DOF_MODE_EFFORT
-            # if self.physics_engine == gymapi.SIM_PHYSX:
-                # franka_dof_props['stiffness'][i] = franka_dof_stiffness[i]
-                # franka_dof_props['damping'][i] = franka_dof_damping[i]
-            # else:
-            #     franka_dof_props['stiffness'][i] = 7000.0
-            #     franka_dof_props['damping'][i] = 50.0
-
-            # self.franka_dof_lower_limits.append(-1.0)
-            # self.franka_dof_upper_limits.append(1.0)
             if i < 7:
                 franka_dof_props['stiffness'][i] = franka_dof_stiffness[i]
                 franka_dof_props['damping'][i] = franka_dof_damping[i]
