@@ -35,7 +35,7 @@ from isaacgym.torch_utils import *
 from tasks.base.vec_task import VecTask
 
 
-class UR5Rope(VecTask):
+class FrankaRope(VecTask):
 
     def __init__(self, cfg, sim_device, graphics_device_id, headless):
         self.cfg = cfg
