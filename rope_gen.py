@@ -9,6 +9,7 @@ mass = 0.3 / (num_cylinders)
 
 num_links = num_cylinders * 2
 length_list = [0, cylinder_length] * (num_cylinders)
+radius_list = [0, cylinder_radius] * (num_cylinders)
 # length_true = 1.0 / (num_links//2)
 
 links = []
@@ -27,12 +28,15 @@ joint_limit =Limit( lower=joint_limit_lower,
 for i in range(num_links):
     # Add link
     link_length = length_list[i]
+    link_radius = radius_list[i]
+
     name = "link" + str(i)
     origin = "{} {} {}".format(0., 0., link_length/2)
     inertial = Inertial(Mass(value=mass), Origin(xyz=origin))
-    visual = Visual(Geometry(Cylinder(length=link_length, radius=cylinder_radius)), Origin(xyz=origin))
-    collision = Collision(Geometry(Cylinder(length=link_length, radius=cylinder_radius)), Origin(xyz=origin))
+    visual = Visual(Geometry(Cylinder(length=link_length, radius=link_radius)), Origin(xyz=origin))
+    collision = Collision(Geometry(Cylinder(length=link_length, radius=link_radius)), Origin(xyz=origin))
     links.append(Link(name, inertial, visual, collision))
+    # links.append(Link(name, inertial, visual))
 
     # add joint
     if (i==0):

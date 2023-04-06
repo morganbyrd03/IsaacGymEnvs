@@ -204,13 +204,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -240,13 +240,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -276,13 +276,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -312,13 +312,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -348,13 +348,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -384,13 +384,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -420,13 +420,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -456,13 +456,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -492,13 +492,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -528,13 +528,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -564,13 +564,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -600,13 +600,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -636,13 +636,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -672,13 +672,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -708,13 +708,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -744,13 +744,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -780,13 +780,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -816,13 +816,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -852,13 +852,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -888,13 +888,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -924,13 +924,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -960,13 +960,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -996,13 +996,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -1032,13 +1032,13 @@
   </inertial>
   <visual >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </visual>
   <collision >
    <geometry >
-    <cylinder  length="0"  radius="0.02" />
+    <cylinder  length="0"  radius="0" />
    </geometry>
    <origin  xyz="0.0 0.0 0.0" />
   </collision>
@@ -1065,7 +1065,7 @@
   <parent  link="panda_hand" />
   <child  link="link0" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1073,7 +1073,7 @@
   <parent  link="link0" />
   <child  link="link1" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1081,7 +1081,7 @@
   <parent  link="link1" />
   <child  link="link2" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1089,7 +1089,7 @@
   <parent  link="link2" />
   <child  link="link3" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1097,7 +1097,7 @@
   <parent  link="link3" />
   <child  link="link4" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1105,7 +1105,7 @@
   <parent  link="link4" />
   <child  link="link5" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1113,7 +1113,7 @@
   <parent  link="link5" />
   <child  link="link6" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1121,7 +1121,7 @@
   <parent  link="link6" />
   <child  link="link7" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1129,7 +1129,7 @@
   <parent  link="link7" />
   <child  link="link8" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1137,7 +1137,7 @@
   <parent  link="link8" />
   <child  link="link9" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1145,7 +1145,7 @@
   <parent  link="link9" />
   <child  link="link10" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1153,7 +1153,7 @@
   <parent  link="link10" />
   <child  link="link11" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1161,7 +1161,7 @@
   <parent  link="link11" />
   <child  link="link12" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1169,7 +1169,7 @@
   <parent  link="link12" />
   <child  link="link13" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1177,7 +1177,7 @@
   <parent  link="link13" />
   <child  link="link14" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1185,7 +1185,7 @@
   <parent  link="link14" />
   <child  link="link15" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1193,7 +1193,7 @@
   <parent  link="link15" />
   <child  link="link16" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1201,7 +1201,7 @@
   <parent  link="link16" />
   <child  link="link17" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1209,7 +1209,7 @@
   <parent  link="link17" />
   <child  link="link18" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1217,7 +1217,7 @@
   <parent  link="link18" />
   <child  link="link19" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1225,7 +1225,7 @@
   <parent  link="link19" />
   <child  link="link20" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1233,7 +1233,7 @@
   <parent  link="link20" />
   <child  link="link21" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1241,7 +1241,7 @@
   <parent  link="link21" />
   <child  link="link22" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1249,7 +1249,7 @@
   <parent  link="link22" />
   <child  link="link23" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1257,7 +1257,7 @@
   <parent  link="link23" />
   <child  link="link24" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1265,7 +1265,7 @@
   <parent  link="link24" />
   <child  link="link25" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1273,7 +1273,7 @@
   <parent  link="link25" />
   <child  link="link26" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1281,7 +1281,7 @@
   <parent  link="link26" />
   <child  link="link27" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1289,7 +1289,7 @@
   <parent  link="link27" />
   <child  link="link28" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1297,7 +1297,7 @@
   <parent  link="link28" />
   <child  link="link29" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1305,7 +1305,7 @@
   <parent  link="link29" />
   <child  link="link30" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1313,7 +1313,7 @@
   <parent  link="link30" />
   <child  link="link31" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1321,7 +1321,7 @@
   <parent  link="link31" />
   <child  link="link32" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1329,7 +1329,7 @@
   <parent  link="link32" />
   <child  link="link33" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1337,7 +1337,7 @@
   <parent  link="link33" />
   <child  link="link34" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1345,7 +1345,7 @@
   <parent  link="link34" />
   <child  link="link35" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1353,7 +1353,7 @@
   <parent  link="link35" />
   <child  link="link36" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1361,7 +1361,7 @@
   <parent  link="link36" />
   <child  link="link37" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1369,7 +1369,7 @@
   <parent  link="link37" />
   <child  link="link38" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1377,7 +1377,7 @@
   <parent  link="link38" />
   <child  link="link39" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1385,7 +1385,7 @@
   <parent  link="link39" />
   <child  link="link40" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1393,7 +1393,7 @@
   <parent  link="link40" />
   <child  link="link41" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1401,7 +1401,7 @@
   <parent  link="link41" />
   <child  link="link42" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1409,7 +1409,7 @@
   <parent  link="link42" />
   <child  link="link43" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1417,7 +1417,7 @@
   <parent  link="link43" />
   <child  link="link44" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1425,7 +1425,7 @@
   <parent  link="link44" />
   <child  link="link45" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
@@ -1433,7 +1433,7 @@
   <parent  link="link45" />
   <child  link="link46" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="0 1 0" />
   <origin  xyz="0.0 0.0 0.041666666666666664" />
  </joint>
@@ -1441,7 +1441,7 @@
   <parent  link="link46" />
   <child  link="link47" />
   <dynamics  damping="0.0" />
-  <limit  lower="-2.5"  upper="2.5"  effort="20"  velocity="20" />
+  <limit  upper="2.5"  lower="-2.5"  effort="20"  velocity="20" />
   <axis  xyz="1 0 0" />
   <origin  xyz="0.0 0.0 0" />
  </joint>
