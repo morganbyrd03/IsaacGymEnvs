@@ -321,7 +321,6 @@ def compute_franka_reward(
     r = 0.1
     center = default_hand_pos 
     target = center
-    print(time_since_reset)
 
     target[:, 1] = r * torch.cos(w*time_since_reset)
     target[:, 2] = r * torch.sin(w*time_since_reset)
