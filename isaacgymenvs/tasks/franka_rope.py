@@ -200,7 +200,7 @@ class FrankaRope(VecTask):
 
         rope_end_state = self.rigid_body_states[:, -1, :]
         rope_end_pos = rope_end_state[:, :3]
-        print("Rope end position: ", rope_end_state[0, :3])
+        # print("Rope end position: ", rope_end_state[0, :3])
 
         hand_state = self.rigid_body_states[:, 7, :]
         hand_pos = hand_state[:, :3]
@@ -291,7 +291,7 @@ def compute_franka_reward(
     # Hand position reward
     # target = cycle_target(time_since_reset)
 
-    default_hand_pos = torch.tensor([0.2, 0.2, 0.7], device="cuda:0")
+    default_hand_pos = torch.tensor([0.6, 0.2, 0.7], device="cuda:0")
     default_hand_pos = torch.ones((progress_buf.shape[0], 3), device="cuda:0") * default_hand_pos
 
     cycle_per_second = 1
@@ -300,8 +300,8 @@ def compute_franka_reward(
     center = default_hand_pos 
     target = center
 
-    target[:, 1] = r * torch.cos(w*time_since_reset)
-    target[:, 2] = r * torch.sin(w*time_since_reset)
+    target[:, 1] += r * torch.cos(w*time_since_reset)
+    target[:, 2] += r * torch.sin(w*time_since_reset)
     ###############################################
     hand_pos = obs_buf[:, -7:-4]
 
@@ -318,6 +318,8 @@ def compute_franka_reward(
     reset_buf = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), reset_buf)
 
     # print("Rewards: ", rewards)
+    print(f"Hand Position: {hand_pos[0,0].item()} {hand_pos[0,1].item()} {hand_pos[0,2].item()}" )
+    print(f"Targ Position: {target[0,0].item()} {target[0,1].item()} {target[0,2].item()}" )
     print("Average reward: ", torch.mean(rewards))
 
     return rewards, reset_buf
