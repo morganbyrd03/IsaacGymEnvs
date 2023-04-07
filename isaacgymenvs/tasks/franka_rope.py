@@ -312,7 +312,7 @@ def compute_franka_reward(
     hand_pos_reward = torch.sum(torch.exp(-torch.square(hand_pos - target)), dim=-1)
     hand_ori_reward = torch.sum(torch.exp(-torch.square(hand_ori - target_ori)), dim=-1)
 
-    rewards = hand_pos_reward + hand_ori_reward + pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.0
+    rewards = hand_pos_reward + pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.0
 
     # reset if max length reached
     reset_buf = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), reset_buf)
