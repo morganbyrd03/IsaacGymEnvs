@@ -62,7 +62,7 @@ class FrankaRope(VecTask):
         self.distX_offset = 0.04
         self.dt = 1 / 60.
 
-        self.num_rope_joints = 48
+        self.num_rope_joints = 24 * 2
         self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 # 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori)
         self.cfg["env"]["numActions"] = 6
 
@@ -288,8 +288,8 @@ def compute_franka_reward(
     dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
     rope_pos = obs_buf[:, -10:-7]
-    target_pos = torch.tensor([0.2, 0.8, 0.5], device="cuda:0")
-    pos_reward = 0 * torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
+    target_pos = torch.tensor([0.8, 0.8, 0.5], device="cuda:0")
+    pos_reward = torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
 
     # DOF velocity penalty
     dof_vel = obs_buf[:, 6:]
@@ -322,14 +322,16 @@ def compute_franka_reward(
     hand_pos_reward = torch.sum(torch.exp(-torch.square(hand_pos - target)), dim=-1)
     hand_ori_reward = torch.sum(torch.exp(-torch.square(hand_ori - target_ori)), dim=-1)
 
-    rewards = hand_pos_reward + pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.0
+    rewards = pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.0
 
     # reset if max length reached
     reset_buf = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), reset_buf)
 
     # print("Rewards: ", rewards)
-    print(f"Hand Position: {hand_pos[0,0].item()} {hand_pos[0,1].item()} {hand_pos[0,2].item()}" )
-    print(f"Targ Position: {target[0,0].item()} {target[0,1].item()} {target[0,2].item()}" )
+    print(f"Rope End Position: {rope_pos[0,0].item()} {rope_pos[0,1].item()} {rope_pos[0,2].item()}" )
+    print(f"Targ Position: {target_pos[0].item()} {target_pos[1].item()} {target_pos[2].item()}" )
+    # print(f"Hand Position: {hand_pos[0,0].item()} {hand_pos[0,1].item()} {hand_pos[0,2].item()}" )
+    # print(f"Targ Position: {target[0,0].item()} {target[0,1].item()} {target[0,2].item()}" )
     print("Average reward: ", torch.mean(rewards))
 
     return rewards, reset_buf

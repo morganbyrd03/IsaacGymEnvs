@@ -2,13 +2,13 @@ from odio_urdf import *
 
 rope = Robot("rope")
 
-num_cylinders = 24
+num_cylinders = 24 # 24
 cylinder_length = 1.0 / (num_cylinders)
-cylinder_radius = 0.02
+cylinder_radius = 0.02 # 0.02
 mass = 0.3 / (num_cylinders)
 
 num_links = num_cylinders * 2
-length_list = [0, cylinder_length/2] * (num_cylinders)
+length_list = [0, cylinder_length] * (num_cylinders)
 radius_list = [0, cylinder_radius] * (num_cylinders)
 # length_true = 1.0 / (num_links//2)
 
