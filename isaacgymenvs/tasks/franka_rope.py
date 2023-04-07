@@ -146,15 +146,24 @@ class FrankaRope(VecTask):
         self.franka_dof_lower_limits = []
         self.franka_dof_upper_limits = []
         for i in range(self.num_franka_dofs):
-            franka_dof_props['driveMode'][i] = gymapi.DOF_MODE_EFFORT
             if i < 7:
-                franka_dof_props['stiffness'][i] = franka_dof_stiffness[i]
-                franka_dof_props['damping'][i] = franka_dof_damping[i]
+                franka_dof_props['driveMode'][i] = gymapi.DOF_MODE_EFFORT
+                franka_dof_props['stiffness'][i] = 0.0 #franka_dof_stiffness[i]
+                franka_dof_props['damping'][i] = 0.0 #franka_dof_damping[i]
                 self.franka_dof_lower_limits.append(franka_dof_props['lower'][i])
                 self.franka_dof_upper_limits.append(franka_dof_props['upper'][i])
             else:
-                franka_dof_props['stiffness'][i] = 0.1
-                franka_dof_props['damping'][i] = 0.1
+                # __import__('pdb').set_trace()
+                franka_dof_props['driveMode'][i] = gymapi.DOF_MODE_NONE
+                # franka_dof_props['stiffness'][i] = 0.0
+                # franka_dof_props['damping'][i] = 0.0
+
+                # # franka_dof_props['hasLimits'][i] = False
+                # franka_dof_props['lower'][i] = -np.inf
+                # franka_dof_props['upper'][i] = np.inf
+                # franka_dof_props['velocity'][i] = np.inf
+                # franka_dof_props['effort'][i] = np.inf
+                
                 self.franka_dof_lower_limits.append(-np.inf)
                 self.franka_dof_upper_limits.append(np.inf)
 
@@ -174,7 +183,8 @@ class FrankaRope(VecTask):
                 self.sim, lower, upper, num_per_row
             )
 
-            franka_actor = self.gym.create_actor(env_ptr, franka_asset, franka_start_pose, "franka", i, 0, 0)
+            # franka_actor = self.gym.create_actor(env_ptr, franka_asset, franka_start_pose, "franka", i, 0, 0)
+            franka_actor = self.gym.create_actor(env_ptr, franka_asset, franka_start_pose, "franka", i, 1, 0) # disable self collision
             self.gym.set_actor_dof_properties(env_ptr, franka_actor, franka_dof_props)
 
             self.envs.append(env_ptr)
