@@ -206,10 +206,10 @@ class FrankaRope(VecTask):
         dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
         rope_pos = self.obs_buf[:, -10:-7]
-        # target_pos = torch.tensor([0.4, 0.4, 0.5], device="cuda:0")
-        target_pos = torch.zeros((self.progress_buf.shape[0], 3), device="cuda:0")
-        target_pos[:, :2] = torch_rand_float(0.6, 1.0, (self.progress_buf.shape[0], 2), device="cuda:0")
-        target_pos[:, 2] += torch_rand_float(0.4, 1.0, (self.progress_buf.shape[0], 1), device="cuda:0")[:, 0]
+        target_pos = torch.tensor([0.4, 0.4, 0.5], device="cuda:0")
+        # target_pos = torch.zeros((self.progress_buf.shape[0], 3), device="cuda:0")
+        # target_pos[:, :2] = torch_rand_float(0.6, 1.0, (self.progress_buf.shape[0], 2), device="cuda:0")
+        # target_pos[:, 2] += torch_rand_float(0.4, 1.0, (self.progress_buf.shape[0], 1), device="cuda:0")[:, 0]
         # target_pos = torch.ones((progress_buf.shape[0], 3), device="cuda:0") * target_pos
         # cycle_per_second = 1
         # w = (2 * np.pi) / cycle_per_second
@@ -250,7 +250,7 @@ class FrankaRope(VecTask):
         hand_pos_reward = torch.sum(torch.exp(-torch.square(hand_pos - target)), dim=-1)
         hand_ori_reward = torch.sum(torch.exp(-torch.square(hand_ori - target_ori)), dim=-1)
 
-        rewards = pos_reward - dof_vel_reward - action_reward
+        rewards = pos_reward #- dof_vel_reward - action_reward
         self.rew_buf[:] = rewards
 
         # reset if max length reached
@@ -297,7 +297,12 @@ class FrankaRope(VecTask):
                         torch.rand((len(env_ids), self.num_franka_dofs), device=self.device) - 0.5),
             self.franka_dof_lower_limits, self.franka_dof_upper_limits)
         self.dof_pos[env_ids, :] = pos
+        self.dof_pos[env_ids, :] = 0.0
+        self.dof_pos[env_ids, 5] = 1.57
         self.dof_vel[env_ids, :] = torch.zeros_like(self.dof_vel[env_ids])
+
+        # self.rigid_body_states[:, -1, 2] = 0.5
+        # print("Actor: ", self.root_state_tensor.shape)
 
         self.gym.set_dof_state_tensor_indexed(self.sim,
                                               gymtorch.unwrap_tensor(self.dof_state),
@@ -308,10 +313,15 @@ class FrankaRope(VecTask):
 
     def pre_physics_step(self, actions):
         self.actions = torch.clip(actions.clone(), -1.0, 1.0).to(self.device)
+        rigid_body_forces = torch.zeros((self.progress_buf.shape[0], self.num_bodies, 3), device=self.device)
+        rigid_body_forces[:, -1, 0] = -1000
         forces = torch.zeros_like(self.dof_pos, device=self.device)
-        forces[:, :6] = self.actions * 400.
+        # forces[:, :6] = self.actions * 400.
         force_tensor = gymtorch.unwrap_tensor(forces)
         self.gym.set_dof_actuation_force_tensor(self.sim, force_tensor)
+        self.gym.apply_rigid_body_force_tensors(self.sim, gymtorch.unwrap_tensor(rigid_body_forces),
+                                                None,
+                                                gymapi.ENV_SPACE)
 
     def post_physics_step(self):
         self.progress_buf += 1
