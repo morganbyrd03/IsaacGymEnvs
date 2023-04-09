@@ -36,7 +36,7 @@ for i in range(num_links):
     visual = Visual(Geometry(Cylinder(length=link_length, radius=link_radius)), Origin(xyz=origin))
     collision = Collision(Geometry(Cylinder(length=link_length, radius=link_radius)), Origin(xyz=origin))
     links.append(Link(name, inertial, visual, collision))
-    # links.append(Link(name, inertial, visual))
+    # links.append(Link(name, inertial, visual)) # doesn't seem to work without collision WHY???
 
     # add joint
     if (i==0):
