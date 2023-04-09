@@ -104,6 +104,7 @@ class FrankaRope(VecTask):
         # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
 
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
+        self.vis_init() # For visualizing target pos
 
     def create_sim(self):
         self.sim_params.up_axis = gymapi.UP_AXIS_Z
@@ -368,7 +369,63 @@ class FrankaRope(VecTask):
 
         self.compute_observations()
         self.compute_reward(self.actions)
+        
+        self.vis_step()
+    
+    def vis_init(self):
+        """
+        Initialize visualizing settings
+        From isaacgym/python/examples/transform.py
+        """
+        self.vis_colors = [tuple(0.5 + 0.5 * np.random.random(3)) for _ in range(self.num_envs)]
 
+
+    def vis_step(self):
+        """
+        Set visualizer objects
+        """
+        rope_pos = self.obs_buf[:, -11:-8]
+        
+
+        r = 0.8 * 2**0.5
+        x = r*torch.cos(np.pi*self.command[:])
+        y = r*torch.sin(np.pi*self.command[:])
+        target_pos = torch.zeros(self.num_envs, 3, device=self.device)
+        target_pos[:, 0] = x[:, 0]
+        target_pos[:, 1] = y[:, 0]
+        target_pos[:, 2] = 0.5
+
+        self.gym.clear_lines(self.viewer)
+
+        for env_id in range(self.num_envs):            
+            # Get the transforms we want to visualize
+            vis_rope_pos = rope_pos[env_id].detach().tolist()
+            vis_targ_pos = target_pos[env_id].detach().tolist()
+
+            vis_rope_pose = gymapi.Transform()
+            vis_rope_pose.p = gymapi.Vec3(vis_rope_pos[0], vis_rope_pos[1], vis_rope_pos[2])
+            vis_rope_pose.r = gymapi.Quat.from_euler_zyx(-0.5 *  np.pi, 0, 0)
+
+            vis_targ_pose = gymapi.Transform()
+            vis_targ_pose.p = gymapi.Vec3(vis_targ_pos[0], vis_targ_pos[1], vis_targ_pos[2])
+            vis_targ_pose.r = gymapi.Quat.from_euler_zyx(-0.5 *  np.pi, 0, 0)
+
+            sphere_rot = gymapi.Quat.from_euler_zyx(0.5 * np.pi, 0, 0)
+            sphere_pose = gymapi.Transform(r=sphere_rot)
+            sphere_geom_rope = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=(1,1,0))
+            sphere_geom_targ = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=self.vis_colors[env_id])
+
+            gymutil.draw_lines(sphere_geom_rope, 
+                                self.gym, self.viewer, self.envs[env_id], 
+                                vis_rope_pose)
+
+            gymutil.draw_lines(sphere_geom_targ, 
+                                self.gym, self.viewer, self.envs[env_id], 
+                                vis_targ_pose)
+
+
+
+        pass
 
 #####################################################################
 ###=========================jit functions=========================###
