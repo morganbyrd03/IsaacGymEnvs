@@ -49,11 +49,6 @@ class FrankaRope(VecTask):
         self.start_rotation_noise = self.cfg["env"]["startRotationNoise"]
 
         self.dof_vel_scale = self.cfg["env"]["dofVelocityScale"]
-        self.dist_reward_scale = self.cfg["env"]["distRewardScale"]
-        self.rot_reward_scale = self.cfg["env"]["rotRewardScale"]
-        self.around_handle_reward_scale = self.cfg["env"]["aroundHandleRewardScale"]
-        self.open_reward_scale = self.cfg["env"]["openRewardScale"]
-        self.finger_dist_reward_scale = self.cfg["env"]["fingerDistRewardScale"]
         self.action_penalty_scale = self.cfg["env"]["actionPenaltyScale"]
 
         self.debug_viz = self.cfg["env"]["enableDebugVis"]
@@ -65,12 +60,14 @@ class FrankaRope(VecTask):
         self.dt = 1 / 60.
 
         self.num_rope_joints = 24 * 2
-        self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 # 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori)
+        self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 + 2# 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori) + 2(command)
         self.cfg["env"]["numActions"] = 6
 
         self.writer = SummaryWriter(log_dir="./runs/FrankaRope/summaries")
         self.counter = 0
+        self.command_counter = 0
         self.print_counter = 0
+        self.reset_counter = 0
 
         super().__init__(config=self.cfg, sim_device=sim_device, graphics_device_id=graphics_device_id,
                          headless=headless)
@@ -79,12 +76,10 @@ class FrankaRope(VecTask):
         actor_root_state_tensor = self.gym.acquire_actor_root_state_tensor(self.sim)
         dof_state_tensor = self.gym.acquire_dof_state_tensor(self.sim)
         rigid_body_tensor = self.gym.acquire_rigid_body_state_tensor(self.sim)
-        dof_force_tensor = self.gym.acquire_dof_force_tensor(self.sim)
 
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
-        self.gym.refresh_dof_force_tensor(self.sim)
 
         # create some wrapper tensors for different slices
         self.franka_default_dof_pos = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469, 0., 0.], device=self.device)
@@ -101,11 +96,15 @@ class FrankaRope(VecTask):
         self.num_bodies = self.rigid_body_states.shape[1]
 
         self.root_state_tensor = gymtorch.wrap_tensor(actor_root_state_tensor).view(self.num_envs, -1, 13)
-        self.dof_force_tensor = gymtorch.wrap_tensor(dof_force_tensor)
 
-        self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs
+        self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs        
+        
+        self.command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
+        self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]        
+        # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
 
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
+        self.vis_init() # For visualizing target pos
 
     def create_sim(self):
         self.sim_params.up_axis = gymapi.UP_AXIS_Z
@@ -201,6 +200,7 @@ class FrankaRope(VecTask):
 
 
     def compute_reward(self, actions):
+        
         time_since_reset = self.progress_buf * self.dt
 
         # DOF position reward
@@ -209,9 +209,22 @@ class FrankaRope(VecTask):
         # target_dof[0, 1] = -1.0
         dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
-        rope_pos = self.obs_buf[:, -10:-7]
+        self.rope_pos = self.obs_buf[:, -12:-9]
         # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
-        target_pos = torch.tensor([0.8, 0.8, 0.5], device="cuda:0")
+        # r = 0.8 * 2**0.5
+        r = 0.8
+        x = r*torch.cos(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
+        y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
+        z = r*torch.cos(np.pi*self.command[:, 1])
+        self.target_pos = torch.zeros(self.num_envs, 3, device=self.device)
+        self.target_pos[:, 0] = x
+        self.target_pos[:, 1] = y
+        # target_pos[:, 2] = self.command[:, 1]
+        self.target_pos[:,2] = z
+
+        pos_error = torch.sum(torch.square(self.target_pos - self.rope_pos), dim=1)
+        pos_reward = torch.exp(-pos_error)
+
 
         # target_pos = torch.zeros((self.progress_buf.shape[0], 3), device="cuda:0")
         # target_pos[:, :2] = torch_rand_float(0.6, 1.0, (self.progress_buf.shape[0], 2), device="cuda:0")
@@ -223,17 +236,21 @@ class FrankaRope(VecTask):
         #
         # target_pos[:, 1] += r * torch.cos(w*time_since_reset)
         # target_pos[:, 2] += r * torch.sin(w*time_since_reset)
-        pos_reward = torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
+        # pos_reward = torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
 
         # DOF velocity penalty
         dof_vel = self.obs_buf[:, 55:110]
         dof_vel_reward = 0.000001 * torch.sum(dof_vel ** 2, dim=-1)
 
         # regularization on the actions (summed for each environment)
-        action_reward = torch.sum(actions ** 2, dim=-1) * self.action_penalty_scale * 0.01
+        action_reward = torch.sum(actions ** 2, dim=-1) * self.action_penalty_scale
+        # print("Action: ", action_reward)
 
         if self.print_counter % 10 == 0:
-            print("Position reward: ", pos_reward.mean())
+            print("Position reward: ", pos_reward.mean().detach().item())
+            print("Action: ", action_reward.mean().detach().item())
+            # print("Rope position: ", rope_pos.mean(dim=0))
+            # print("target positoin", target_pos[0,:2])
         self.print_counter += 1
 
         # Hand position reward
@@ -251,16 +268,16 @@ class FrankaRope(VecTask):
         target[:, 1] += r * torch.cos(w * time_since_reset)
         target[:, 2] += r * torch.sin(w * time_since_reset)
         ###############################################
-        hand_pos = self.obs_buf[:, -7:-4]
+        hand_pos = self.obs_buf[:, -9:-6]
 
         hand_ori = self.obs_buf[:, -4:]
         # TODO: change it to correct direction
         target_ori = torch.tensor([0, 0, 0, 1], device="cuda:0")
-
-        hand_pos_reward = torch.sum(torch.exp(-torch.square(hand_pos - target)), dim=-1)
+        
+        hand_pos_reward = torch.exp(torch.clip(hand_pos[:,2]-0.5,None,0))
         hand_ori_reward = torch.sum(torch.exp(-torch.square(hand_ori - target_ori)), dim=-1)
 
-        rewards = pos_reward #- dof_vel_reward - action_reward
+        rewards = pos_reward*hand_pos_reward - action_reward#- dof_vel_reward - action_reward
         self.rew_buf[:] = rewards
 
         # reset if max length reached
@@ -279,7 +296,12 @@ class FrankaRope(VecTask):
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
-
+        # if self.counter % 200 == 0:
+        #     self.command_counter+=1
+        #     angle = (self.command_counter*0.1) % 2 - 1
+        #     print(angle)        
+        #     self.command[:, 0] = torch.tensor(angle*np.ones((self.num_envs)), dtype=torch.float32, device=self.device)
+        #     self.command[:, 1] += 0.05
         # print("Rigid body state: ", self.rigid_body_states.shape)
 
         rope_end_state = self.rigid_body_states[:, -1, :]
@@ -293,7 +315,7 @@ class FrankaRope(VecTask):
         hand_ori = hand_state[:, 3:7]
 
         dof_pos = self.dof_pos - self.franka_default_dof_pos
-        self.obs_buf = torch.cat((dof_pos, self.dof_vel * self.dof_vel_scale, rope_end_pos, hand_pos, hand_ori),
+        self.obs_buf = torch.cat((dof_pos, self.dof_vel * self.dof_vel_scale, rope_end_pos, hand_pos, hand_ori, self.command),
                                  dim=-1)
         # Logging
         self.writer.add_scalar("obs/hand_x", hand_pos[0, 0], self.counter)
@@ -301,20 +323,25 @@ class FrankaRope(VecTask):
         return self.obs_buf
 
     def reset_idx(self, env_ids):
+        # Reset Command
+        # self.command[env_ids, :] = torch_rand_float(-1,1,(len(env_ids), 1) ,device=self.device)
+        # self.print_counter = self.print_counter%10
+        # angle = (self.reset_counter*0.1) % 2 - 1
+        # print(angle)
+        # angle = -0.9
+        # self.command = torch.tensor(angle*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
+        new_command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
+        new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
+        self.command[env_ids, :] = new_command[env_ids, :]
         env_ids_int32 = env_ids.to(dtype=torch.int32)
-
         # reset franka
         pos = tensor_clamp(
             self.franka_default_dof_pos.unsqueeze(0) + 0.25 * (
                         torch.rand((len(env_ids), self.num_franka_dofs), device=self.device) - 0.5),
             self.franka_dof_lower_limits, self.franka_dof_upper_limits)
+            
         self.dof_pos[env_ids, :] = pos
-        # self.dof_pos[env_ids, :] = 0.0
-        # self.dof_pos[env_ids, 5] = 1.57
         self.dof_vel[env_ids, :] = torch.zeros_like(self.dof_vel[env_ids])
-
-        # self.rigid_body_states[:, -1, 2] = 0.5
-        # print("Actor: ", self.root_state_tensor.shape)
 
         self.gym.set_dof_state_tensor_indexed(self.sim,
                                               gymtorch.unwrap_tensor(self.dof_state),
@@ -322,6 +349,7 @@ class FrankaRope(VecTask):
 
         self.progress_buf[env_ids] = 0
         self.reset_buf[env_ids] = 0
+        self.reset_counter += 1
 
     def pre_physics_step(self, actions):
         self.actions = torch.clip(actions.clone(), -1.0, 1.0).to(self.device)
@@ -344,7 +372,54 @@ class FrankaRope(VecTask):
 
         self.compute_observations()
         self.compute_reward(self.actions)
+        
+        self.vis_step()
+    
+    def vis_init(self):
+        """
+        Initialize visualizing settings
+        From isaacgym/python/examples/transform.py
+        """
+        self.vis_colors = [tuple(0.5 + 0.5 * np.random.random(3)) for _ in range(self.num_envs)]
 
+        sphere_rot = gymapi.Quat.from_euler_zyx(0.5 * np.pi, 0, 0)
+        sphere_pose = gymapi.Transform(r=sphere_rot)
+        for env_id in range(self.num_envs):
+            self.sphere_geom_rope = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=(1,1,0))
+            self.sphere_geom_targ = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=self.vis_colors[env_id])
+
+
+    def vis_step(self):
+        """
+        Set visualizer objects
+        """
+        self.gym.clear_lines(self.viewer)
+
+        for env_id in range(self.num_envs):            
+            # Get the transforms we want to visualize
+            vis_rope_pos = self.rope_pos[env_id].detach().tolist()
+            vis_targ_pos = self.target_pos[env_id].detach().tolist()
+
+            vis_rope_pose = gymapi.Transform()
+            vis_rope_pose.p = gymapi.Vec3(vis_rope_pos[0], vis_rope_pos[1], vis_rope_pos[2])
+            vis_rope_pose.r = gymapi.Quat.from_euler_zyx(-0.5 *  np.pi, 0, 0)
+
+            vis_targ_pose = gymapi.Transform()
+            vis_targ_pose.p = gymapi.Vec3(vis_targ_pos[0], vis_targ_pos[1], vis_targ_pos[2])
+            vis_targ_pose.r = gymapi.Quat.from_euler_zyx(-0.5 *  np.pi, 0, 0)
+
+
+            gymutil.draw_lines(self.sphere_geom_rope, 
+                                self.gym, self.viewer, self.envs[env_id], 
+                                vis_rope_pose)
+
+            gymutil.draw_lines(self.sphere_geom_targ, 
+                                self.gym, self.viewer, self.envs[env_id], 
+                                vis_targ_pose)
+
+
+
+        pass
 
 #####################################################################
 ###=========================jit functions=========================###
