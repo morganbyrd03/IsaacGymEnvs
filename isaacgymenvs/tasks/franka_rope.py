@@ -62,14 +62,15 @@ class FrankaRope(VecTask):
         self.up_axis_idx = 2
 
         self.distX_offset = 0.04
-        self.dt = 1 / 60. / 4
+        self.dt = 1 / 60.
 
-        self.num_rope_joints = 12 * 2
+        self.num_rope_joints = 24 * 2
         self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 # 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori)
         self.cfg["env"]["numActions"] = 6
 
         self.writer = SummaryWriter(log_dir="./runs/FrankaRope/summaries")
         self.counter = 0
+        self.print_counter = 0
 
         super().__init__(config=self.cfg, sim_device=sim_device, graphics_device_id=graphics_device_id,
                          headless=headless)
@@ -133,7 +134,7 @@ class FrankaRope(VecTask):
         asset_options.flip_visual_attachments = True
         asset_options.fix_base_link = True
         asset_options.collapse_fixed_joints = True
-        asset_options.disable_gravity = True
+        # asset_options.disable_gravity = True
         asset_options.thickness = 0.001
         asset_options.replace_cylinder_with_capsule = True
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_POS
@@ -163,8 +164,8 @@ class FrankaRope(VecTask):
             else:
                 # __import__('pdb').set_trace()
                 franka_dof_props['driveMode'][i] = gymapi.DOF_MODE_NONE
-                franka_dof_props['stiffness'][i] = 0.0
-                franka_dof_props['damping'][i] = 0.0
+                # franka_dof_props['stiffness'][i] = 0.0
+                # franka_dof_props['damping'][i] = 0.0
 
                 # franka_dof_props['hasLimits'][i] = True
                 # franka_dof_props['lower'][i] = -np.pi
@@ -209,7 +210,9 @@ class FrankaRope(VecTask):
         dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
         rope_pos = self.obs_buf[:, -10:-7]
-        target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
+        # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
+        target_pos = torch.tensor([0.8, 0.8, 0.5], device="cuda:0")
+
         # target_pos = torch.zeros((self.progress_buf.shape[0], 3), device="cuda:0")
         # target_pos[:, :2] = torch_rand_float(0.6, 1.0, (self.progress_buf.shape[0], 2), device="cuda:0")
         # target_pos[:, 2] += torch_rand_float(0.4, 1.0, (self.progress_buf.shape[0], 1), device="cuda:0")[:, 0]
@@ -228,6 +231,10 @@ class FrankaRope(VecTask):
 
         # regularization on the actions (summed for each environment)
         action_reward = torch.sum(actions ** 2, dim=-1) * self.action_penalty_scale * 0.01
+
+        if self.print_counter % 10 == 0:
+            print("Position reward: ", pos_reward.mean())
+        self.print_counter += 1
 
         # Hand position reward
         # target = cycle_target(time_since_reset)
@@ -297,15 +304,13 @@ class FrankaRope(VecTask):
         env_ids_int32 = env_ids.to(dtype=torch.int32)
 
         # reset franka
-        print("Dof position: ", self.dof_pos[0, :])
-        print("Dof force: ", self.dof_force_tensor[0:55])
         pos = tensor_clamp(
             self.franka_default_dof_pos.unsqueeze(0) + 0.25 * (
                         torch.rand((len(env_ids), self.num_franka_dofs), device=self.device) - 0.5),
             self.franka_dof_lower_limits, self.franka_dof_upper_limits)
         self.dof_pos[env_ids, :] = pos
-        self.dof_pos[env_ids, :] = 0.0
-        self.dof_pos[env_ids, 5] = 1.57
+        # self.dof_pos[env_ids, :] = 0.0
+        # self.dof_pos[env_ids, 5] = 1.57
         self.dof_vel[env_ids, :] = torch.zeros_like(self.dof_vel[env_ids])
 
         # self.rigid_body_states[:, -1, 2] = 0.5
@@ -326,9 +331,9 @@ class FrankaRope(VecTask):
         forces[:, :6] = self.actions * 400.
         force_tensor = gymtorch.unwrap_tensor(forces)
         self.gym.set_dof_actuation_force_tensor(self.sim, force_tensor)
-        self.gym.apply_rigid_body_force_tensors(self.sim, gymtorch.unwrap_tensor(rigid_body_forces),
-                                                None,
-                                                gymapi.ENV_SPACE)
+        # self.gym.apply_rigid_body_force_tensors(self.sim, gymtorch.unwrap_tensor(rigid_body_forces),
+        #                                         None,
+        #                                         gymapi.ENV_SPACE)
 
     def post_physics_step(self):
         self.progress_buf += 1
