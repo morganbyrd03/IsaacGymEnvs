@@ -384,16 +384,15 @@ class FrankaRope(VecTask):
         """
         Set visualizer objects
         """
-        rope_pos = self.obs_buf[:, -11:-8]
-        
-
+        rope_pos = self.obs_buf[:, -12:-9]
+        # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
         r = 0.8 * 2**0.5
-        x = r*torch.cos(np.pi*self.command[:])
-        y = r*torch.sin(np.pi*self.command[:])
+        x = r*torch.cos(np.pi*self.command[:, 0])
+        y = r*torch.sin(np.pi*self.command[:, 0])
         target_pos = torch.zeros(self.num_envs, 3, device=self.device)
-        target_pos[:, 0] = x[:, 0]
-        target_pos[:, 1] = y[:, 0]
-        target_pos[:, 2] = 0.5
+        target_pos[:, 0] = x
+        target_pos[:, 1] = y
+        target_pos[:, 2] = self.command[:, 1]
 
         self.gym.clear_lines(self.viewer)
 
