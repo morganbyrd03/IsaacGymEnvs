@@ -100,7 +100,7 @@ class FrankaRope(VecTask):
         self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs        
         
         self.command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
-        self.command[:,1] = torch_rand_float(0.5,1.5,(self.num_envs,1),device=self.device)[:, 0]
+        self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]        
         # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
 
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
@@ -209,17 +209,20 @@ class FrankaRope(VecTask):
         # target_dof[0, 1] = -1.0
         dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
-        rope_pos = self.obs_buf[:, -12:-9]
+        self.rope_pos = self.obs_buf[:, -12:-9]
         # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
-        r = 0.8 * 2**0.5
-        x = r*torch.cos(np.pi*self.command[:, 0])
-        y = r*torch.sin(np.pi*self.command[:, 0])
-        target_pos = torch.zeros(self.num_envs, 3, device=self.device)
-        target_pos[:, 0] = x
-        target_pos[:, 1] = y
-        target_pos[:, 2] = self.command[:, 1]
+        # r = 0.8 * 2**0.5
+        r = 0.8
+        x = r*torch.cos(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
+        y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
+        z = r*torch.cos(np.pi*self.command[:, 1])
+        self.target_pos = torch.zeros(self.num_envs, 3, device=self.device)
+        self.target_pos[:, 0] = x
+        self.target_pos[:, 1] = y
+        # target_pos[:, 2] = self.command[:, 1]
+        self.target_pos[:,2] = z
 
-        pos_error = torch.sum(torch.square(target_pos - rope_pos), dim=1)
+        pos_error = torch.sum(torch.square(self.target_pos - self.rope_pos), dim=1)
         pos_reward = torch.exp(-pos_error)
 
 
@@ -328,7 +331,7 @@ class FrankaRope(VecTask):
         # angle = -0.9
         # self.command = torch.tensor(angle*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
         new_command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
-        new_command[:,1] = torch_rand_float(0.5,1.5,(self.num_envs,1),device=self.device)[:, 0]
+        new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
         self.command[env_ids, :] = new_command[env_ids, :]
         env_ids_int32 = env_ids.to(dtype=torch.int32)
         # reset franka
@@ -379,27 +382,23 @@ class FrankaRope(VecTask):
         """
         self.vis_colors = [tuple(0.5 + 0.5 * np.random.random(3)) for _ in range(self.num_envs)]
 
+        sphere_rot = gymapi.Quat.from_euler_zyx(0.5 * np.pi, 0, 0)
+        sphere_pose = gymapi.Transform(r=sphere_rot)
+        for env_id in range(self.num_envs):
+            self.sphere_geom_rope = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=(1,1,0))
+            self.sphere_geom_targ = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=self.vis_colors[env_id])
+
 
     def vis_step(self):
         """
         Set visualizer objects
         """
-        rope_pos = self.obs_buf[:, -12:-9]
-        # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
-        r = 0.8 * 2**0.5
-        x = r*torch.cos(np.pi*self.command[:, 0])
-        y = r*torch.sin(np.pi*self.command[:, 0])
-        target_pos = torch.zeros(self.num_envs, 3, device=self.device)
-        target_pos[:, 0] = x
-        target_pos[:, 1] = y
-        target_pos[:, 2] = self.command[:, 1]
-
         self.gym.clear_lines(self.viewer)
 
         for env_id in range(self.num_envs):            
             # Get the transforms we want to visualize
-            vis_rope_pos = rope_pos[env_id].detach().tolist()
-            vis_targ_pos = target_pos[env_id].detach().tolist()
+            vis_rope_pos = self.rope_pos[env_id].detach().tolist()
+            vis_targ_pos = self.target_pos[env_id].detach().tolist()
 
             vis_rope_pose = gymapi.Transform()
             vis_rope_pose.p = gymapi.Vec3(vis_rope_pos[0], vis_rope_pos[1], vis_rope_pos[2])
@@ -409,16 +408,12 @@ class FrankaRope(VecTask):
             vis_targ_pose.p = gymapi.Vec3(vis_targ_pos[0], vis_targ_pos[1], vis_targ_pos[2])
             vis_targ_pose.r = gymapi.Quat.from_euler_zyx(-0.5 *  np.pi, 0, 0)
 
-            sphere_rot = gymapi.Quat.from_euler_zyx(0.5 * np.pi, 0, 0)
-            sphere_pose = gymapi.Transform(r=sphere_rot)
-            sphere_geom_rope = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=(1,1,0))
-            sphere_geom_targ = gymutil.WireframeSphereGeometry(0.04, 12, 12, sphere_pose, color=self.vis_colors[env_id])
 
-            gymutil.draw_lines(sphere_geom_rope, 
+            gymutil.draw_lines(self.sphere_geom_rope, 
                                 self.gym, self.viewer, self.envs[env_id], 
                                 vis_rope_pose)
 
-            gymutil.draw_lines(sphere_geom_targ, 
+            gymutil.draw_lines(self.sphere_geom_targ, 
                                 self.gym, self.viewer, self.envs[env_id], 
                                 vis_targ_pose)
 
