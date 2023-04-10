@@ -76,10 +76,12 @@ class FrankaRope(VecTask):
         actor_root_state_tensor = self.gym.acquire_actor_root_state_tensor(self.sim)
         dof_state_tensor = self.gym.acquire_dof_state_tensor(self.sim)
         rigid_body_tensor = self.gym.acquire_rigid_body_state_tensor(self.sim)
+        jacobian_tensor = self.gym.acquire_jacobian_tensor(self.sim)
 
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
+        self.gym.refresh_jacobian_tensor(self.sim)
 
         # create some wrapper tensors for different slices
         self.franka_default_dof_pos = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469, 0., 0.], device=self.device)
@@ -97,11 +99,16 @@ class FrankaRope(VecTask):
 
         self.root_state_tensor = gymtorch.wrap_tensor(actor_root_state_tensor).view(self.num_envs, -1, 13)
 
+        self.jacobian_tensor = gymtorch.wrap_tensor(jacobian_tensor)  # Probably need to reshape
+
         self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs        
         
         self.command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
         self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]        
         # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
+
+        # For PD controller
+        self.torques = torch.zeros((self.num_envs, 6), device=self.device)
 
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
         self.vis_init() # For visualizing target pos
@@ -296,6 +303,7 @@ class FrankaRope(VecTask):
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
+        self.gym.refresh_jacobian_tensor(self.sim)
         # if self.counter % 200 == 0:
         #     self.command_counter+=1
         #     angle = (self.command_counter*0.1) % 2 - 1
@@ -355,6 +363,14 @@ class FrankaRope(VecTask):
         self.actions = torch.clip(actions.clone(), -1.0, 1.0).to(self.device)
         rigid_body_forces = torch.zeros((self.progress_buf.shape[0], self.num_bodies, 3), device=self.device)
         # rigid_body_forces[:, -3, 2] = 100.
+        # For PD Controller
+        # Compute joint velocities for given task space velocity
+        # jacobian_pinv = torch.linalg.pinv(self.jacobian_tensor)
+        # desired_dof_vel = torch.matmul(jacobian_pinv, desired_trajectory_vel)
+        # Compute forces for given joint velocities
+        # torques = (desired_dof_vel - self.dof_vel[:, :6]) * 1.0
+        # self.torques += torques
+        # forces[:, :6] = self.torques
         forces = torch.zeros_like(self.dof_pos, device=self.device)
         forces[:, :6] = self.actions * 400.
         force_tensor = gymtorch.unwrap_tensor(forces)
@@ -420,97 +436,4 @@ class FrankaRope(VecTask):
 
 
         pass
-
-#####################################################################
-###=========================jit functions=========================###
-#####################################################################
-# @torch.jit.script
-# def cycle_target(t):
-#     # type: (Tensor) -> Tensor
-
-#     default_hand_pos = torch.tensor([0.2, 0.2, 0.7], device="cuda:0")
-
-#     cycle_per_second = 1
-#     w = (2 * np.pi) / cycle_per_second
-#     r = 0.1
-#     center = default_hand_pos 
-#     target = center
-#     target[1] = r * torch.cos(w*t)
-#     target[2] = r * torch.sin(w*t)
-#     return target
-
-# @torch.jit.script
-# def compute_franka_reward(
-#         obs_buf, reset_buf, progress_buf, actions, action_penalty_scale, max_episode_length, time_since_reset
-# ):
-#     # type: (Tensor, Tensor, Tensor, Tensor, float, float, Tensor) -> Tuple[Tensor, Tensor]
-#
-#     # DOF position reward
-#     dof_pos = obs_buf[:, :6]
-#     target_dof = torch.ones((1, 6), device="cuda:0")
-#     # target_dof[0, 1] = -1.0
-#     dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
-#
-#     rope_pos = obs_buf[:, -10:-7]
-#     # target_pos = torch.tensor([0.4, 0.4, 0.5], device="cuda:0")
-#     target_pos = torch.zeros((progress_buf.shape[0], 3), device="cuda:0")
-#     target_pos[:, :2] = torch_rand_float(0.6, 1.0, (progress_buf.shape[0], 2), device="cuda:0")
-#     target_pos[:, 2] += torch_rand_float(0.4, 1.0, (progress_buf.shape[0], 1), device="cuda:0")[:, 0]
-#     # target_pos = torch.ones((progress_buf.shape[0], 3), device="cuda:0") * target_pos
-#     # cycle_per_second = 1
-#     # w = (2 * np.pi) / cycle_per_second
-#     # r = 0.4
-#     #
-#     # target_pos[:, 1] += r * torch.cos(w*time_since_reset)
-#     # target_pos[:, 2] += r * torch.sin(w*time_since_reset)
-#     pos_reward = torch.sum(torch.exp(-torch.square(rope_pos - target_pos)), dim=-1)
-#
-#     # DOF velocity penalty
-#     dof_vel = obs_buf[:, 55:110]
-#     dof_vel_penalty = 0.000001 * torch.sum(dof_vel ** 2, dim=-1)
-#
-#     # regularization on the actions (summed for each environment)
-#     action_penalty = torch.sum(actions ** 2, dim=-1)
-#
-#     # Hand position reward
-#     # target = cycle_target(time_since_reset)
-#
-#     default_hand_pos = torch.tensor([0.6, 0.2, 0.7], device="cuda:0")
-#     default_hand_pos = torch.ones((progress_buf.shape[0], 3), device="cuda:0") * default_hand_pos
-#
-#     cycle_per_second = 1
-#     w = (2 * np.pi) / cycle_per_second
-#     r = 0.1
-#     center = default_hand_pos
-#     target = center
-#
-#     target[:, 1] += r * torch.cos(w*time_since_reset)
-#     target[:, 2] += r * torch.sin(w*time_since_reset)
-#     ###############################################
-#     hand_pos = obs_buf[:, -7:-4]
-#
-#     hand_ori = obs_buf[:, -4:]
-#     # TODO: change it to correct direction
-#     target_ori = torch.tensor([0, 0, 0, 1], device="cuda:0")
-#
-#     hand_pos_reward = torch.sum(torch.exp(-torch.square(hand_pos - target)), dim=-1)
-#     hand_ori_reward = torch.sum(torch.exp(-torch.square(hand_ori - target_ori)), dim=-1)
-#
-#     writer.add_scalar("rewards/position", pos_reward.mean(), 0)
-#
-#     rewards = pos_reward - dof_vel_penalty - action_penalty_scale * action_penalty * 0.01
-#
-#     # reset if max length reached
-#     reset_buf = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), reset_buf)
-#
-#     # print("Rewards: ", rewards)
-#     # print("Target: ", target_pos[0, :])
-#     # print("Rope: ", rope_pos[0, :])
-#     # print(f"Rope End Position: {rope_pos[0,0].item()} {rope_pos[0,1].item()} {rope_pos[0,2].item()}" )
-#     # print(f"Targ Position: {target_pos[0].item()} {target_pos[1].item()} {target_pos[2].item()}" )
-#     # print(f"Hand Position: {hand_pos[0,0].item()} {hand_pos[0,1].item()} {hand_pos[0,2].item()}" )
-#     # print(f"Targ Position: {target[0,0].item()} {target[0,1].item()} {target[0,2].item()}" )
-#     # print("Average reward: ", torch.mean(rewards))
-#
-#     return rewards, reset_buf
 
