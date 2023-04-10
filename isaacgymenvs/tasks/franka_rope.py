@@ -60,7 +60,7 @@ class FrankaRope(VecTask):
         self.dt = 1 / 60.
 
         self.num_rope_joints = 24 * 2
-        self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 + 2# 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori) + 2(command)
+        self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 + 3# 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori) + 3(command)
         self.cfg["env"]["numActions"] = 6
 
         self.writer = SummaryWriter(log_dir="./runs/FrankaRope/summaries")
@@ -99,8 +99,9 @@ class FrankaRope(VecTask):
 
         self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs        
         
-        self.command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
-        self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]        
+        self.command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
+        self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]
+        self.command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
         # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
 
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
@@ -209,10 +210,10 @@ class FrankaRope(VecTask):
         # target_dof[0, 1] = -1.0
         dof_reward = torch.sum(torch.square(dof_pos - target_dof), dim=-1)
 
-        self.rope_pos = self.obs_buf[:, -12:-9]
+        self.rope_pos = self.obs_buf[:, -13:-10]
         # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
         # r = 0.8 * 2**0.5
-        r = 0.8
+        r = self.command[:, 2]
         x = r*torch.cos(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
         y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
         z = r*torch.cos(np.pi*self.command[:, 1])
