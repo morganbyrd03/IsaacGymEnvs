@@ -331,7 +331,7 @@ class FrankaRope(VecTask):
         # print(angle)
         # angle = -0.9
         # self.command = torch.tensor(angle*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
-        new_command = torch_rand_float(-1,1,(self.num_envs, 2) ,device=self.device)   
+        new_command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
         new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
         new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
         
