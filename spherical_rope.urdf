@@ -1,0 +1,579 @@
+<?xml version="1.0"?>
+<robot  name="rope" >
+ <link  name="link0" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link1" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link2" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link3" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link4" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link5" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link6" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link7" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link8" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link9" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link10" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link11" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link12" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link13" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link14" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link15" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link16" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link17" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link18" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link19" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link20" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link21" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link22" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <link  name="link23" >
+  <inertial >
+   <mass  value="0.012499999999999999" />
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </inertial>
+  <visual >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </visual>
+  <collision >
+   <geometry >
+    <cylinder  length="0.041666666666666664"  radius="0.02" />
+   </geometry>
+   <origin  xyz="0.0 0.0 0.020833333333333332" />
+  </collision>
+ </link>
+ <joint  name="joint0"  type="spherical" >
+  <parent  link="panda_hand" />
+  <child  link="link0" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0" />
+ </joint>
+ <joint  name="joint1"  type="spherical" >
+  <parent  link="link0" />
+  <child  link="link1" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint2"  type="spherical" >
+  <parent  link="link1" />
+  <child  link="link2" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint3"  type="spherical" >
+  <parent  link="link2" />
+  <child  link="link3" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint4"  type="spherical" >
+  <parent  link="link3" />
+  <child  link="link4" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint5"  type="spherical" >
+  <parent  link="link4" />
+  <child  link="link5" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint6"  type="spherical" >
+  <parent  link="link5" />
+  <child  link="link6" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint7"  type="spherical" >
+  <parent  link="link6" />
+  <child  link="link7" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint8"  type="spherical" >
+  <parent  link="link7" />
+  <child  link="link8" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint9"  type="spherical" >
+  <parent  link="link8" />
+  <child  link="link9" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint10"  type="spherical" >
+  <parent  link="link9" />
+  <child  link="link10" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint11"  type="spherical" >
+  <parent  link="link10" />
+  <child  link="link11" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint12"  type="spherical" >
+  <parent  link="link11" />
+  <child  link="link12" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint13"  type="spherical" >
+  <parent  link="link12" />
+  <child  link="link13" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint14"  type="spherical" >
+  <parent  link="link13" />
+  <child  link="link14" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint15"  type="spherical" >
+  <parent  link="link14" />
+  <child  link="link15" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint16"  type="spherical" >
+  <parent  link="link15" />
+  <child  link="link16" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint17"  type="spherical" >
+  <parent  link="link16" />
+  <child  link="link17" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint18"  type="spherical" >
+  <parent  link="link17" />
+  <child  link="link18" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint19"  type="spherical" >
+  <parent  link="link18" />
+  <child  link="link19" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint20"  type="spherical" >
+  <parent  link="link19" />
+  <child  link="link20" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint21"  type="spherical" >
+  <parent  link="link20" />
+  <child  link="link21" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint22"  type="spherical" >
+  <parent  link="link21" />
+  <child  link="link22" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+ <joint  name="joint23"  type="spherical" >
+  <parent  link="link22" />
+  <child  link="link23" />
+  <dynamics  damping="0.0" />
+  <origin  xyz="0.0 0.0 0.041666666666666664" />
+ </joint>
+</robot>
