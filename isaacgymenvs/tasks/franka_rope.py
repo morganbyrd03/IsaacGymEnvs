@@ -58,7 +58,7 @@ class FrankaRope(VecTask):
 
         self.distX_offset = 0.04
         self.dt = 1 / 60.
-
+        self.which_env = 0
         self.num_rope_joints = 24 * 2
         self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 + 3# 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori) + 3(command)
         self.cfg["env"]["numActions"] = 6
@@ -76,12 +76,12 @@ class FrankaRope(VecTask):
         actor_root_state_tensor = self.gym.acquire_actor_root_state_tensor(self.sim)
         dof_state_tensor = self.gym.acquire_dof_state_tensor(self.sim)
         rigid_body_tensor = self.gym.acquire_rigid_body_state_tensor(self.sim)
-        jacobian_tensor = self.gym.acquire_jacobian_tensor(self.sim)
+        # jacobian_tensor = self.gym.acquire_jacobian_tensor(self.sim, "franka")
 
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
-        self.gym.refresh_jacobian_tensor(self.sim)
+        # self.gym.refresh_jacobian_tensors(self.sim)
 
         # create some wrapper tensors for different slices
         self.franka_default_dof_pos = to_torch([1.157, -1.066, -0.155, -2.239, -1.841, 1.003, 0.469, 0., 0.], device=self.device)
@@ -93,26 +93,31 @@ class FrankaRope(VecTask):
         self.franka_dof_state = self.dof_state.view(self.num_envs, -1, 2)[:, :self.num_franka_dofs]
         self.dof_pos = self.franka_dof_state[..., 0]
         self.dof_vel = self.franka_dof_state[..., 1]
+        self.last_dof_vel = torch.zeros_like(self.dof_vel, device=self.device)
+        self.target_pos = torch.zeros(self.num_envs, 3, device=self.device)
+        self.last_rope_pos = torch.zeros((self.num_envs, 3), device=self.device)
+        self.last_hand_pos = torch.zeros((self.num_envs, 3), device=self.device)
 
         self.rigid_body_states = gymtorch.wrap_tensor(rigid_body_tensor).view(self.num_envs, -1, 13)
         self.num_bodies = self.rigid_body_states.shape[1]
 
         self.root_state_tensor = gymtorch.wrap_tensor(actor_root_state_tensor).view(self.num_envs, -1, 13)
 
-        self.jacobian_tensor = gymtorch.wrap_tensor(jacobian_tensor)  # Probably need to reshape
+        # self.jacobian_tensor = gymtorch.wrap_tensor(jacobian_tensor)  # Probably need to reshape
 
         self.num_dofs = self.gym.get_sim_dof_count(self.sim) // self.num_envs        
         
         self.command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
         self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]
-        self.command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
+        # self.command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
+        self.command[:,2] = torch_rand_float(0.7, 1.1, (self.num_envs,1), device=self.device)[:, 0]
         # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
 
         # For PD controller
         self.torques = torch.zeros((self.num_envs, 6), device=self.device)
 
         self.reset_idx(torch.arange(self.num_envs, device=self.device))
-        self.vis_init() # For visualizing target pos
+        # self.vis_init() # For visualizing target pos
 
     def create_sim(self):
         self.sim_params.up_axis = gymapi.UP_AXIS_Z
@@ -140,7 +145,7 @@ class FrankaRope(VecTask):
         asset_options = gymapi.AssetOptions()
         asset_options.flip_visual_attachments = True
         asset_options.fix_base_link = True
-        asset_options.collapse_fixed_joints = True
+        # asset_options.collapse_fixed_joints = True
         # asset_options.disable_gravity = True
         asset_options.thickness = 0.001
         asset_options.replace_cylinder_with_capsule = True
@@ -221,14 +226,20 @@ class FrankaRope(VecTask):
         # target_pos = torch.tensor([-0.8, 0., 0.8], device="cuda:0")
         # r = 0.8 * 2**0.5
         r = self.command[:, 2]
-        x = r*torch.cos(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
-        y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1])
+        x = r*torch.cos(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1]) + 1.
+        y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1]) + 0.3
         z = r*torch.cos(np.pi*self.command[:, 1])
-        self.target_pos = torch.zeros(self.num_envs, 3, device=self.device)
+        self.last_target_pos = self.target_pos.clone()
         self.target_pos[:, 0] = x
         self.target_pos[:, 1] = y
         # target_pos[:, 2] = self.command[:, 1]
         self.target_pos[:,2] = z
+        # self.writer.add_scalar("command_tracking/command_x", x[self.which_env], self.counter)
+        # self.writer.add_scalar("command_tracking/command_y", y[self.which_env], self.counter)
+        # self.writer.add_scalar("command_tracking/command_z", z[self.which_env], self.counter)
+        # self.writer.add_scalar("command_tracking/actual_x", self.rope_pos[self.which_env,0], self.counter)
+        # self.writer.add_scalar("command_tracking/actual_y", self.rope_pos[self.which_env,1], self.counter)
+        # self.writer.add_scalar("command_tracking/actual_z", self.rope_pos[self.which_env,2], self.counter)
 
         pos_error = torch.sum(torch.square(self.target_pos - self.rope_pos), dim=1)
         pos_reward = torch.exp(-pos_error)
@@ -304,20 +315,30 @@ class FrankaRope(VecTask):
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
-        self.gym.refresh_jacobian_tensor(self.sim)
-        # if self.counter % 200 == 0:
-        #     self.command_counter+=1
-        #     angle = (self.command_counter*0.1) % 2 - 1
-        #     print(angle)        
-        #     self.command[:, 0] = torch.tensor(angle*np.ones((self.num_envs)), dtype=torch.float32, device=self.device)
-        #     self.command[:, 1] += 0.05
+        # self.gym.refresh_jacobian_tensors(self.sim)
+        # if self.counter % 800 == 0:            
+        #     new_command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
+        #     new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
+        #     new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]        
+        #     self.command[:, :] = new_command[:, :]
         # print("Rigid body state: ", self.rigid_body_states.shape)
 
         rope_end_state = self.rigid_body_states[:, -1, :]
         rope_end_pos = rope_end_state[:, :3]
+        rope_end_vel = rope_end_state[:, -6:-3]
+        self.last_rope_pos = rope_end_pos.clone()
+
+        hand_end_state = self.rigid_body_states[:,  6, :]
+        hand_end_pos = rope_end_state[:, :3]
+        hand_end_vel = rope_end_state[:, -6:-3]
+        self.last_hand_pos = hand_end_pos.clone()
         # print("Rope end position: ", rope_end_state[0, :3])
         # print("Dof velocities: ", self.dof_vel[0, :])
         # print("Dof positions: ", self.dof_pos[0, :])
+
+        # franka_state = self.rigid_body_states[:, :6, :]
+        # franka_pos = franka_state[:, :,  :3]
+        # print("Franka position: ", franka_pos[0, 0, :])
 
         hand_state = self.rigid_body_states[:, 7, :]
         hand_pos = hand_state[:, :3]
@@ -327,7 +348,10 @@ class FrankaRope(VecTask):
         self.obs_buf = torch.cat((dof_pos, self.dof_vel * self.dof_vel_scale, rope_end_pos, hand_pos, hand_ori, self.command),
                                  dim=-1)
         # Logging
-        self.writer.add_scalar("obs/hand_x", hand_pos[0, 0], self.counter)
+        self.writer.add_scalar("obs/rope_vel_x", rope_end_vel[0, 0], self.counter)
+        self.writer.add_scalar("obs/rope_vel_y", rope_end_vel[0, 1], self.counter)
+        self.writer.add_scalar("obs/rope_vel_z", rope_end_vel[0, 2], self.counter)
+
 
         return self.obs_buf
 
@@ -339,10 +363,17 @@ class FrankaRope(VecTask):
         # print(angle)
         # angle = -0.9
         # self.command = torch.tensor(angle*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
+        # print("===========================================================================done!+=========================================================================================================================")
+        # print("===========================================================================done!+=========================================================================================================================")
+        # print("===========================================================================done!+=========================================================================================================================")
+        # print("===========================================================================done!+=========================================================================================================================")
+        # print("===========================================================================done!+=========================================================================================================================")
+        # print("===========================================================================done!+=========================================================================================================================")
+        # print("===========================================================================done!+=========================================================================================================================")
+
         new_command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
         new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
-        new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
-        
+        new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]        
         self.command[env_ids, :] = new_command[env_ids, :]
         env_ids_int32 = env_ids.to(dtype=torch.int32)
         # reset franka
@@ -352,6 +383,8 @@ class FrankaRope(VecTask):
             self.franka_dof_lower_limits, self.franka_dof_upper_limits)
             
         self.dof_pos[env_ids, :] = pos
+        # Save previous dof velocities
+        self.last_dof_vel[env_ids, :] = self.dof_vel[env_ids, :]
         self.dof_vel[env_ids, :] = torch.zeros_like(self.dof_vel[env_ids])
 
         self.gym.set_dof_state_tensor_indexed(self.sim,
@@ -368,19 +401,31 @@ class FrankaRope(VecTask):
         # rigid_body_forces[:, -3, 2] = 100.
         # For PD Controller
         # Compute joint velocities for given task space velocity
-        # jacobian_pinv = torch.linalg.pinv(self.jacobian_tensor)
-        # desired_dof_vel = torch.matmul(jacobian_pinv, desired_trajectory_vel)
-        # Compute forces for given joint velocities
-        # torques = (desired_dof_vel - self.dof_vel[:, :6]) * 1.0
-        # self.torques += torques
-        # forces[:, :6] = self.torques
+        # jacobian = self.jacobian_tensor[:, -1, :3, :6]  # Only use cartesian velocities and actuated joints
+        # jacobian = self.jacobian_tensor[:, 6, :3, :6]  # Only use cartesian velocities and actuated joints
+        # jacobian_pinv = torch.linalg.pinv(jacobian)
+        # desired_trajectory_vel = torch.ones([self.num_envs, 3, 1], device=self.device)
+        # desired_trajectory_vel = (self.target_pos - self.last_rope_pos)/self.dt * 0
+        # desired_trajectory_vel = (self.target_pos - self.last_rope_pos)/self.dt * 100
+        # desired_dof_vel = torch.matmul(jacobian_pinv, desired_trajectory_vel.reshape(-1, 3, 1))[:, :, 0]
+        # # Compute forces for given joint velocities
+        # prop_term = desired_dof_vel - self.dof_vel[:, :6]
+        # deriv_term = self.dof_vel[:, :6] - self.last_dof_vel[:, :6]
+        # torques = prop_term * 1.0 + deriv_term * 10.0
+        # self.torques = torch.clamp(torques, -400., 400.)
+        # print("Torques: ", self.torques)
         forces = torch.zeros_like(self.dof_pos, device=self.device)
         forces[:, :6] = self.actions * 400.
+        # forces[:, :6] = self.torques
         force_tensor = gymtorch.unwrap_tensor(forces)
         self.gym.set_dof_actuation_force_tensor(self.sim, force_tensor)
         # self.gym.apply_rigid_body_force_tensors(self.sim, gymtorch.unwrap_tensor(rigid_body_forces),
         #                                         None,
         #                                         gymapi.ENV_SPACE)
+        # self.writer.add_scalar("obs/computed_rope_vel_x", desired_trajectory_vel[0, 0], self.counter)
+        # self.writer.add_scalar("obs/computed_rope_vel_y", desired_trajectory_vel[0, 1], self.counter)
+        # self.writer.add_scalar("obs/computed_rope_vel_z", desired_trajectory_vel[0, 2], self.counter)
+
 
     def post_physics_step(self):
         self.progress_buf += 1
@@ -392,7 +437,7 @@ class FrankaRope(VecTask):
         self.compute_observations()
         self.compute_reward(self.actions)
         
-        self.vis_step()
+        # self.vis_step()
     
     def vis_init(self):
         """
