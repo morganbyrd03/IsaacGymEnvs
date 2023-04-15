@@ -29,7 +29,7 @@
 import numpy as np
 import os
 import torch
-
+import time
 from isaacgym import gymutil, gymtorch, gymapi
 from isaacgym.torch_utils import *
 from tasks.base.vec_task import VecTask
@@ -58,7 +58,7 @@ class FrankaRope(VecTask):
 
         self.distX_offset = 0.04
         self.dt = 1 / 60.
-        self.which_env = 0
+        self.which_env = 3
         self.num_rope_joints = 24 * 2
         self.cfg["env"]["numObservations"] = (7+self.num_rope_joints)* 2 + 3+3+4 + 3# 25 = (7+24) * 2(angle, angvel) + 3(rope-pos) + 3(hand-pos) + 4(hand-ori) + 3(command)
         self.cfg["env"]["numActions"] = 6
@@ -109,8 +109,15 @@ class FrankaRope(VecTask):
         
         self.command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
         self.command[:,1] = torch_rand_float(0,0.5,(self.num_envs,1),device=self.device)[:, 0]
-        # self.command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
+        self.command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]
+
+        # self.command = torch_rand_float(0.,2.,(self.num_envs, 3) ,device=self.device)   
+        # self.command[:,1] = torch_rand_float(0.,1.,(self.num_envs,1),device=self.device)[:, 0]
+        # self.command[:,2] = torch_rand_float(0., 0.9, (self.num_envs,1), device=self.device)[:, 0]
+        self.command[:,0] = torch_rand_float(-0.3,0.2,(self.num_envs,1),device=self.device)[:, 0]
+        self.command[:,1] = torch_rand_float(0.3,0.7,(self.num_envs,1),device=self.device)[:, 0]
         self.command[:,2] = torch_rand_float(0.7, 1.1, (self.num_envs,1), device=self.device)[:, 0]
+        # self.command[:,2] = torch_rand_float(0.7, 1.1, (self.num_envs,1), device=self.device)[:, 0]
         # self.command = torch.tensor(0.2*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
 
         # For PD controller
@@ -227,22 +234,27 @@ class FrankaRope(VecTask):
         # r = 0.8 * 2**0.5
         r = self.command[:, 2]
         x = r*torch.cos(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1]) + 1.
-        y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1]) + 0.3
+        y = r*torch.sin(np.pi*self.command[:, 0])*torch.sin(np.pi*self.command[:, 1]) + 0.5
         z = r*torch.cos(np.pi*self.command[:, 1])
         self.last_target_pos = self.target_pos.clone()
         self.target_pos[:, 0] = x
         self.target_pos[:, 1] = y
         # target_pos[:, 2] = self.command[:, 1]
         self.target_pos[:,2] = z
-        # self.writer.add_scalar("command_tracking/command_x", x[self.which_env], self.counter)
-        # self.writer.add_scalar("command_tracking/command_y", y[self.which_env], self.counter)
-        # self.writer.add_scalar("command_tracking/command_z", z[self.which_env], self.counter)
-        # self.writer.add_scalar("command_tracking/actual_x", self.rope_pos[self.which_env,0], self.counter)
-        # self.writer.add_scalar("command_tracking/actual_y", self.rope_pos[self.which_env,1], self.counter)
-        # self.writer.add_scalar("command_tracking/actual_z", self.rope_pos[self.which_env,2], self.counter)
+        self.target_pos[:, 0] = self.command[:, 0]
+        self.target_pos[:, 1] = self.command[:, 1]
+        self.target_pos[:, 2] = self.command[:, 2]
 
-        pos_error = torch.sum(torch.square(self.target_pos - self.rope_pos), dim=1)
-        pos_reward = torch.exp(-pos_error)
+        self.writer.add_scalar("command_tracking/command_x", self.command[self.which_env,0], self.counter)
+        self.writer.add_scalar("command_tracking/command_y", self.command[self.which_env,1], self.counter)
+        self.writer.add_scalar("command_tracking/command_z", self.command[self.which_env,2], self.counter)
+        self.writer.add_scalar("command_tracking/actual_x", self.rope_pos[self.which_env,0], self.counter)
+        self.writer.add_scalar("command_tracking/actual_y", self.rope_pos[self.which_env,1], self.counter)
+        self.writer.add_scalar("command_tracking/actual_z", self.rope_pos[self.which_env,2], self.counter)        
+        pos_error = torch.sum(torch.square(self.target_pos - self.rope_pos), dim=1)                
+        pos_reward = torch.exp(-pos_error)        
+        self.writer.add_scalar("errors/pos_error", torch.mean(pos_error), self.counter)        
+        self.writer.add_scalar("errors/reward", torch.mean(pos_reward), self.counter)
 
 
         # target_pos = torch.zeros((self.progress_buf.shape[0], 3), device="cuda:0")
@@ -272,21 +284,6 @@ class FrankaRope(VecTask):
             # print("target positoin", target_pos[0,:2])
         self.print_counter += 1
 
-        # Hand position reward
-        # target = cycle_target(time_since_reset)
-
-        default_hand_pos = torch.tensor([0.6, 0.2, 0.7], device="cuda:0")
-        default_hand_pos = torch.ones((self.progress_buf.shape[0], 3), device="cuda:0") * default_hand_pos
-
-        cycle_per_second = 1
-        w = (2 * np.pi) / cycle_per_second
-        r = 0.1
-        center = default_hand_pos
-        target = center
-
-        target[:, 1] += r * torch.cos(w * time_since_reset)
-        target[:, 2] += r * torch.sin(w * time_since_reset)
-        ###############################################
         hand_pos = self.obs_buf[:, -9:-6]
 
         hand_ori = self.obs_buf[:, -4:]
@@ -316,11 +313,17 @@ class FrankaRope(VecTask):
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
         # self.gym.refresh_jacobian_tensors(self.sim)
-        # if self.counter % 800 == 0:            
-        #     new_command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
-        #     new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
-        #     new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]        
-        #     self.command[:, :] = new_command[:, :]
+        if self.counter % 1000 == 0:            
+            new_command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
+            new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
+            new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]        
+            
+            # test command is 10cm wider
+            new_command[:,0] = torch_rand_float(-0.35,0.25,(self.num_envs,1),device=self.device)[:, 0]
+            new_command[:,1] = torch_rand_float(0.25,0.75,(self.num_envs,1),device=self.device)[:, 0]
+            new_command[:,2] = torch_rand_float(0.65, 1.15, (self.num_envs,1), device=self.device)[:, 0]
+
+            self.command[:, :] = new_command[:, :]
         # print("Rigid body state: ", self.rigid_body_states.shape)
 
         rope_end_state = self.rigid_body_states[:, -1, :]
@@ -363,17 +366,22 @@ class FrankaRope(VecTask):
         # print(angle)
         # angle = -0.9
         # self.command = torch.tensor(angle*np.ones((self.num_envs, 1)), dtype=torch.float32, device=self.device)
-        # print("===========================================================================done!+=========================================================================================================================")
-        # print("===========================================================================done!+=========================================================================================================================")
-        # print("===========================================================================done!+=========================================================================================================================")
-        # print("===========================================================================done!+=========================================================================================================================")
-        # print("===========================================================================done!+=========================================================================================================================")
-        # print("===========================================================================done!+=========================================================================================================================")
-        # print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        print("===========================================================================done!+=========================================================================================================================")
+        # time.sleep(10)
 
         new_command = torch_rand_float(-1,1,(self.num_envs, 3) ,device=self.device)   
         new_command[:,1] = torch_rand_float(0.,0.5,(self.num_envs,1),device=self.device)[:, 0]
-        new_command[:,2] = torch_rand_float(0.5, 0.9, (self.num_envs,1), device=self.device)[:, 0]        
+        new_command[:,2] = torch_rand_float(0.7, 1.1, (self.num_envs,1), device=self.device)[:, 0]
+        
+        new_command[:,0] = torch_rand_float(-0.3,0.2,(self.num_envs,1),device=self.device)[:, 0]
+        new_command[:,1] = torch_rand_float(0.3,0.7,(self.num_envs,1),device=self.device)[:, 0]
+        new_command[:,2] = torch_rand_float(0.7, 1.1, (self.num_envs,1), device=self.device)[:, 0]
         self.command[env_ids, :] = new_command[env_ids, :]
         env_ids_int32 = env_ids.to(dtype=torch.int32)
         # reset franka
@@ -402,13 +410,13 @@ class FrankaRope(VecTask):
         # For PD Controller
         # Compute joint velocities for given task space velocity
         # jacobian = self.jacobian_tensor[:, -1, :3, :6]  # Only use cartesian velocities and actuated joints
-        # jacobian = self.jacobian_tensor[:, 6, :3, :6]  # Only use cartesian velocities and actuated joints
+        # # jacobian = self.jacobian_tensor[:, 6, :3, :6]  # Only use cartesian velocities and actuated joints
         # jacobian_pinv = torch.linalg.pinv(jacobian)
         # desired_trajectory_vel = torch.ones([self.num_envs, 3, 1], device=self.device)
-        # desired_trajectory_vel = (self.target_pos - self.last_rope_pos)/self.dt * 0
+        # # desired_trajectory_vel = (self.target_pos - self.last_rope_pos)/self.dt * 0
         # desired_trajectory_vel = (self.target_pos - self.last_rope_pos)/self.dt * 100
         # desired_dof_vel = torch.matmul(jacobian_pinv, desired_trajectory_vel.reshape(-1, 3, 1))[:, :, 0]
-        # # Compute forces for given joint velocities
+        # # # Compute forces for given joint velocities
         # prop_term = desired_dof_vel - self.dof_vel[:, :6]
         # deriv_term = self.dof_vel[:, :6] - self.last_dof_vel[:, :6]
         # torques = prop_term * 1.0 + deriv_term * 10.0

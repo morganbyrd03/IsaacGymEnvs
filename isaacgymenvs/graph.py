@@ -22,14 +22,15 @@ import numpy as np
 # plt.plot(steps[::10], ours_reward[::10])
 # plt.show()
 
-log_dir = "/home/jkim3662/Projects/Rope/IsaacGymEnvs/isaacgymenvs/runs/FrankaRope/summaries/policy/"
+task = "policy" # "policy"
+log_dir = "/home/jkim3662/Projects/Rope/IsaacGymEnvs/isaacgymenvs/runs/FrankaRope/summaries/"+task+"/"
 event_acc = event_accumulator.EventAccumulator(log_dir)
 event_acc.Reload()
 
 tags = event_acc.Tags()["scalars"]
 data = {}
 for tag in tags:
-    if tag[:3] != "obs" and tag[:3] != "rew":
+    if tag[:3] != "obs" and tag[:3] != "rew" and tag[:3] != "err":
         scalar_data = event_acc.Scalars(tag)
         itr = 0
         for scalar_datum in scalar_data:
@@ -39,10 +40,64 @@ for tag in tags:
             data[tag].append(scalar_datum.value)
             itr+=1
             steps.append(scalar_datum.step)
-        plt.plot(steps,data[tag],label=tag)
+        data[tag]=np.array(data[tag])
+        steps = np.array(steps)
+        plt.plot(steps[:4500],data[tag][:4500],label=tag.split("/")[1])
 
-plt.legend()
+plt.xlabel("Steps",fontsize = 15)
+plt.ylabel("Location (m)",fontsize = 15)
+plt.legend(fontsize=15)
+plt.xticks(fontsize=15)
+plt.yticks(fontsize = 15)
+# plt.savefig(log_dir+"tracking")
 plt.show()
+# plt.clf()
+
+# for tag in tags:
+#     if tag[:3] == "err":
+#         tag_task = tag.split("/")[1]
+#         if(tag_task[:3]== "rew"):
+#             scalar_data = event_acc.Scalars(tag)
+#             itr = 0
+#             for scalar_datum in scalar_data:
+#                 if itr == 0:
+#                     data[tag] = []
+#                     steps = []
+#                 data[tag].append(scalar_datum.value)
+#                 itr+=1
+#                 steps.append(scalar_datum.step)
+#             data[tag] = np.array(data[tag])
+#             steps = np.array(steps)
+#             plt.plot(steps[:4500],data[tag][:4500],label=tag.split("/")[1])
+
+# plt.xlabel("Steps")
+# plt.ylabel("Position Reward")
+
+# plt.savefig(log_dir+"pos_reward")
+# plt.clf()
+
+# for tag in tags:
+#     if tag[:3] == "err":
+#         tag_task = tag.split("/")[1]
+#         if(tag_task[:3]== "pos"):
+#             scalar_data = event_acc.Scalars(tag)
+#             itr = 0
+#             for scalar_datum in scalar_data:
+#                 if itr == 0:
+#                     data[tag] = []
+#                     steps = []
+#                 data[tag].append(scalar_datum.value)
+#                 itr+=1
+#                 steps.append(scalar_datum.step)
+#             data[tag] = np.array(data[tag])
+#             steps = np.array(steps)
+#             plt.plot(steps[:4500],data[tag][:4500],label=tag.split("/")[1])
+
+# plt.xlabel("Steps")
+# plt.ylabel("Position error")
+
+# plt.savefig(log_dir+"por_err")
+# plt.clf()
 
 
 
